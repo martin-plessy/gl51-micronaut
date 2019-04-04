@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/martin-utbm/gl51-micronaut.svg?branch=master)](https://travis-ci.com/martin-utbm/gl51-micronaut)
+
 Links
 ----
 
