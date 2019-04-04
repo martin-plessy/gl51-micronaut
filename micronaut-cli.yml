@@ -1,0 +1,5 @@
+profile: service
+defaultPackage: fr.utbm.gl51.famp
+---
+testFramework: spock
+sourceLanguage: groovy
