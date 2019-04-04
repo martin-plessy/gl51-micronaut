@@ -3,8 +3,6 @@ package fr.utbm.gl51.famp
 import io.micronaut.context.ApplicationContext
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.http.client.RxHttpClient
-import io.micronaut.http.HttpResponse
-import io.micronaut.http.HttpStatus
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
@@ -20,9 +18,9 @@ class StudentControllerSpec extends Specification {
 
 	void "It returns the students' names"() {
 		when:
-		HttpResponse response = client.toBlocking().exchange("/student")
+		String response = client.toBlocking().retrieve("/student", String)
 
 		then:
-		response.status == HttpStatus.OK
+		response == "Faraj Al Btadini, Martin Plessy"
 	}
 }
