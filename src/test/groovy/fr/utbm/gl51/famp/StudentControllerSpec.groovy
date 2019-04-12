@@ -18,9 +18,9 @@ class StudentControllerSpec extends Specification {
 
 	void "It returns the students' names"() {
 		when:
-		String response = client.toBlocking().retrieve("/student", String)
+		List<String> response = client.toBlocking().retrieve("/students", List)
 
 		then:
-		response == "Faraj Al Btadini, Martin Plessy"
+		response == [ "Faraj Al Btadini", "Martin Plessy" ]
 	}
 }
