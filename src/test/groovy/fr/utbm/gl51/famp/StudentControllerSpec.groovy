@@ -30,8 +30,8 @@ class StudentControllerSpec extends Specification {
 
 		then:
 		response.collect { objectMapper.convertValue(it, Student) } == [
-			new Student().tap { firstName = "Faraj"; lastName = "Al Btadini" },
-			new Student().tap { firstName = "Martin"; lastName = "Plessy" }
+			new Student(firstName: "Faraj", lastName: "Al Btadini"),
+			new Student(firstName: "Martin", lastName: "Plessy")
 		]
 	}
 }

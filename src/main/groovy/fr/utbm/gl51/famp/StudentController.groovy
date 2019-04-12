@@ -8,8 +8,8 @@ class StudentController {
 	@Get()
 	List<Student> getStudents() {
 		[
-			new Student().tap { firstName = "Faraj" ; lastName = "Al Btadini" },
-			new Student().tap { firstName = "Martin" ; lastName = "Plessy" }
+			new Student(firstName: "Faraj", lastName: "Al Btadini"),
+			new Student(firstName: "Martin", lastName: "Plessy")
 		]
 	}
 }
