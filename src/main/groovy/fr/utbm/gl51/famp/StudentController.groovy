@@ -6,7 +6,10 @@ import io.micronaut.http.annotation.Get
 @Controller("/students")
 class StudentController {
 	@Get()
-	List<String> index() {
-		[ "Faraj Al Btadini", "Martin Plessy" ]
+	List<Student> getStudents() {
+		[
+			new Student().tap { firstName = "Faraj" ; lastName = "Al Btadini" },
+			new Student().tap { firstName = "Martin" ; lastName = "Plessy" }
+		]
 	}
 }
