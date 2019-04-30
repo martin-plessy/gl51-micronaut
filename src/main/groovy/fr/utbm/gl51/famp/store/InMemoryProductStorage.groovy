@@ -1,5 +1,7 @@
 package fr.utbm.gl51.famp.store
 
+import java.util.function.Predicate
+
 class InMemoryProductStorage implements ProductStorage {
 	private List<Product> savedProducts = []
 
@@ -21,14 +23,24 @@ class InMemoryProductStorage implements ProductStorage {
 
 	@Override
 	List<Product> all() {
-		savedProducts == null ? [] : savedProducts // TODO: Remove null check.
+		savedProducts
 	}
 
 	@Override
 	void update(String id, Product p) {
+		def prod=savedProducts.find{it.id==id }
+		if(prod!=null) {
+			p.id = id
+			savedProducts[savedProducts.indexOf(prod)] = p
+		}
+		  else {
+			throw new NoSuchElementException()
+		}
 	}
 
 	@Override
 	void delete(String id) {
+		savedProducts.removeIf{it.id==id}
 	}
 }
+

@@ -33,7 +33,8 @@ class InMemoryProductStorageSpec extends Specification {
 		products.save(newProduct)
 
 		expect:
-		products.all().get(0).id != ""
+		products.all().first().id != ""
+		newProduct.id != ""
 	}
 
 	def "Empty storage | save * N => N product retrievable"() {
@@ -64,5 +65,49 @@ class InMemoryProductStorageSpec extends Specification {
 
 		then:
 		thrown NoSuchElementException
+	}
+	def "Empty storage "() {
+		setup:
+		products.delete("AAAAAA")
+		expect:
+		products.all().isEmpty()
+	}
+	def "delete storage"() {
+		setup:
+		def prod=[new Product(name:"product1"),new Product(name:"product2"),new Product(name:"product3")]
+		for (p in prod) products.save(p)
+
+		products.delete(prod[1].id)
+
+		expect:
+		products.all()==[prod[0],prod[2]]
+	}
+	def "delete idempotent"() {
+		setup:
+		def prod=[new Product(name:"product1"),new Product(name:"product2"),new Product(name:"product3")]
+		for (p in prod) products.save(p)
+
+		products.delete(prod[1].id)
+		products.delete(prod[1].id)
+
+		expect:
+		products.all()==[prod[0],prod[2]]
+	}
+	def "update storage not exist"() {
+		setup:
+		def prod=new Product()
+		when:
+		products.update("aaa",prod)
+		then:
+		thrown NoSuchElementException
+	}
+	def "update storage "() {
+		setup:
+		def prod=[new Product(name:"product1"),new Product(name:"product2"),new Product(name:"product3")]
+		for (p in prod) products.save(p)
+		products.update(prod[1].id,new Product(name: "new product2"))
+		expect:
+		products.all()==[prod[0],new Product(id:prod[1].id,name: "new product2"),prod[2]]
+
 	}
 }
