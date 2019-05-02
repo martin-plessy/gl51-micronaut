@@ -12,7 +12,7 @@ class InMemoryProductStorageSpec extends Specification {
 
 	def "Empty storage | getById => exception"() {
 		when:
-		def product = products.getById("AAAAAA")
+		def _ = products.getById("AAAAAA")
 
 		then:
 		thrown NoSuchElementException
@@ -61,53 +61,78 @@ class InMemoryProductStorageSpec extends Specification {
 		for (i in 1 .. 3) products.save(new Product())
 
 		when:
-		def product = products.getById("AAAAAB")
+		def _ = products.getById("AAAAAC")
 
 		then:
 		thrown NoSuchElementException
 	}
-	def "Empty storage "() {
-		setup:
-		products.delete("AAAAAA")
-		expect:
-		products.all().isEmpty()
-	}
-	def "delete storage"() {
-		setup:
-		def prod=[new Product(name:"product1"),new Product(name:"product2"),new Product(name:"product3")]
-		for (p in prod) products.save(p)
 
-		products.delete(prod[1].id)
+	def "Empty storage | delete => empty storage"() {
+		setup:
+		products.delete("AAAAAB")
 
 		expect:
-		products.all()==[prod[0],prod[2]]
+		products.all() == []
 	}
-	def "delete idempotent"() {
-		setup:
-		def prod=[new Product(name:"product1"),new Product(name:"product2"),new Product(name:"product3")]
-		for (p in prod) products.save(p)
 
-		products.delete(prod[1].id)
-		products.delete(prod[1].id)
+	def "Filled storage | delete => product removed"() {
+		setup:
+		def someProducts = [
+			new Product(name: "One"),
+			new Product(name: "Two"),
+			new Product(name: "Three")
+		]
+
+		for (product in someProducts) products.save(product)
+
+		products.delete(someProducts[1].id)
 
 		expect:
-		products.all()==[prod[0],prod[2]]
+		products.all() == [ someProducts[0], someProducts[2] ]
 	}
-	def "update storage not exist"() {
+
+	def "Filled storage | delete * 2 => idempotent delete"() {
 		setup:
-		def prod=new Product()
+		def someProducts = [
+			new Product(name: "One"),
+			new Product(name: "Two"),
+			new Product(name: "Three")
+		]
+
+		for (product in someProducts) products.save(product)
+
+		products.delete(someProducts[1].id)
+		products.delete(someProducts[1].id)
+
+		expect:
+		products.all() == [ someProducts[0], someProducts[2] ]
+	}
+
+	def "Empty storage | update [not exists] => exception"() {
 		when:
-		products.update("aaa",prod)
+		products.update("AAAAAD", new Product(name: "Updated"))
+
 		then:
 		thrown NoSuchElementException
 	}
+
 	def "update storage "() {
 		setup:
-		def prod=[new Product(name:"product1"),new Product(name:"product2"),new Product(name:"product3")]
-		for (p in prod) products.save(p)
-		products.update(prod[1].id,new Product(name: "new product2"))
-		expect:
-		products.all()==[prod[0],new Product(id:prod[1].id,name: "new product2"),prod[2]]
+		def someProducts = [
+			new Product(name: "One"),
+			new Product(name: "Two"),
+			new Product(name: "Three")
+		]
 
+		for (product in someProducts) products.save(product)
+
+		products.update(someProducts[1].id, new Product(name: "Four"))
+
+		expect:
+		products.all() == [
+			someProducts[0],
+			new Product(id: someProducts[1].id, name: "Four"),
+			someProducts[2]
+		]
 	}
 }

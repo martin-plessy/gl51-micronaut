@@ -1,7 +1,5 @@
 package fr.utbm.gl51.famp.store
 
-import java.util.function.Predicate
-
 class InMemoryProductStorage implements ProductStorage {
 	private List<Product> savedProducts = []
 
@@ -27,20 +25,18 @@ class InMemoryProductStorage implements ProductStorage {
 	}
 
 	@Override
-	void update(String id, Product p) {
-		def prod=savedProducts.find{it.id==id }
-		if(prod!=null) {
-			p.id = id
-			savedProducts[savedProducts.indexOf(prod)] = p
-		}
-		  else {
-			throw new NoSuchElementException()
-		}
+	void update(String id, Product updatedProduct) {
+		def foundProductIndex = savedProducts.findIndexOf { it.id == id }
+
+		if (foundProductIndex == -1)
+			throw new NoSuchElementException("No product with id '$id' exists here.")
+
+		updatedProduct.id = id
+		savedProducts[foundProductIndex] = updatedProduct
 	}
 
 	@Override
 	void delete(String id) {
-		savedProducts.removeIf{it.id==id}
+		savedProducts.removeIf { it.id == id }
 	}
 }
-
