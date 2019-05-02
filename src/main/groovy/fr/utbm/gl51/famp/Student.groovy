@@ -2,8 +2,8 @@ package fr.utbm.gl51.famp
 
 import groovy.transform.EqualsAndHashCode
 
-@EqualsAndHashCode(includeFields = true)
+@EqualsAndHashCode
 class Student {
-	public String firstName = ""
-	public String lastName = ""
+	String firstName = ""
+	String lastName = ""
 }

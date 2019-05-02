@@ -2,7 +2,7 @@ package fr.utbm.gl51.famp.store
 
 import groovy.transform.EqualsAndHashCode
 
-@EqualsAndHashCode(includeFields = true)
+@EqualsAndHashCode
 class Product {
 	String id = ""
 	String name = ""
