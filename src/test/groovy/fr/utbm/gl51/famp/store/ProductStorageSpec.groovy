@@ -6,9 +6,9 @@ class InMemoryProductStorageSpec extends Specification {
 	ProductStorage products = new InMemoryProductStorage()
 	ProductStorage filledProducts
 	def someProducts = [
-			new Product(name: "One"),
-			new Product(name: "Two"),
-			new Product(name: "Three")
+		new Product(name: "One"),
+		new Product(name: "Two"),
+		new Product(name: "Three")
 	]
 
 	def setup() {
