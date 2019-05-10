@@ -3,20 +3,24 @@ package fr.utbm.gl51.famp.store
 import spock.lang.Specification
 
 class InMemoryProductStorageSpec extends Specification {
-	def products = new InMemoryProductStorage()
+	ProductStorage products = new InMemoryProductStorage()
+	ProductStorage filledProducts
+	def someProducts = [
+		new Product(name: "One"),
+		new Product(name: "Two"),
+		new Product(name: "Three")
+	]
+
+	def setup() {
+		filledProducts = new InMemoryProductStorage()
+		someProducts.each {  filledProducts.save(it)}
+	}
 
 	def "Empty storage | all => empty list"() {
 		expect:
 		products.all() == []
 	}
 
-	def "Empty storage | getById => exception"() {
-		when:
-		def _ = products.getById("AAAAAA")
-
-		then:
-		thrown NoSuchElementException
-	}
 
 	def "Empty storage | save => product retrievable"() {
 		setup:
@@ -57,11 +61,8 @@ class InMemoryProductStorageSpec extends Specification {
 	}
 
 	def "Filled storage | getById [not exists] => exception"() {
-		setup:
-		for (i in 1 .. 3) products.save(new Product())
-
 		when:
-		def _ = products.getById("AAAAAC")
+		def _ = filledProducts.getById("AAAAAC")
 
 		then:
 		thrown NoSuchElementException
@@ -77,35 +78,19 @@ class InMemoryProductStorageSpec extends Specification {
 
 	def "Filled storage | delete => product removed"() {
 		setup:
-		def someProducts = [
-			new Product(name: "One"),
-			new Product(name: "Two"),
-			new Product(name: "Three")
-		]
-
-		for (product in someProducts) products.save(product)
-
-		products.delete(someProducts[1].id)
+		filledProducts.delete(someProducts[1].id)
 
 		expect:
-		products.all() == [ someProducts[0], someProducts[2] ]
+		filledProducts.all() == [ someProducts[0], someProducts[2] ]
 	}
 
 	def "Filled storage | delete * 2 => idempotent delete"() {
 		setup:
-		def someProducts = [
-			new Product(name: "One"),
-			new Product(name: "Two"),
-			new Product(name: "Three")
-		]
-
-		for (product in someProducts) products.save(product)
-
-		products.delete(someProducts[1].id)
-		products.delete(someProducts[1].id)
+		filledProducts.delete(someProducts[1].id)
+		filledProducts.delete(someProducts[1].id)
 
 		expect:
-		products.all() == [ someProducts[0], someProducts[2] ]
+		filledProducts.all() == [ someProducts[0], someProducts[2] ]
 	}
 
 	def "Empty storage | update [not exists] => exception"() {
@@ -118,18 +103,10 @@ class InMemoryProductStorageSpec extends Specification {
 
 	def "update storage "() {
 		setup:
-		def someProducts = [
-			new Product(name: "One"),
-			new Product(name: "Two"),
-			new Product(name: "Three")
-		]
-
-		for (product in someProducts) products.save(product)
-
-		products.update(someProducts[1].id, new Product(name: "Four"))
+		filledProducts.update(someProducts[1].id, new Product(name: "Four"))
 
 		expect:
-		products.all() == [
+		filledProducts.all() == [
 			someProducts[0],
 			new Product(id: someProducts[1].id, name: "Four"),
 			someProducts[2]
