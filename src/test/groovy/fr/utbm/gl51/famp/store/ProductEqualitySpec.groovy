@@ -12,4 +12,26 @@ class ProductEqualitySpec extends Specification {
 		expect:
 		new Product(name: "A") != new Product(name: "B")
 	}
+
+	def "List of product equality"() {
+		expect:
+		[
+			new Product(name: "A"),
+			new Product(name: "B")
+		] == [
+			new Product(name: "A"),
+			new Product(name: "B")
+		]
+	}
+
+	def "List of product inequality"() {
+		expect:
+		[
+			new Product(name: "A"),
+			new Product(name: "B")
+		] != [
+			new Product(name: "B"),
+			new Product(name: "C")
+		]
+	}
 }

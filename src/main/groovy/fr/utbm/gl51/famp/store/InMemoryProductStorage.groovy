@@ -1,5 +1,8 @@
 package fr.utbm.gl51.famp.store
 
+import javax.inject.Singleton
+
+@Singleton
 class InMemoryProductStorage implements ProductStorage {
 	private List<Product> savedProducts = []
 

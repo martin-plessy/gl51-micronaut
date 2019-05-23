@@ -24,7 +24,7 @@ class StudentControllerSpec extends Specification {
 	@Shared
 	ObjectMapper objectMapper = new ObjectMapperFactory().objectMapper(new JacksonConfiguration(), new JsonFactory())
 
-	void "It returns the students' names"() {
+	def "It returns the students' names"() {
 		when:
 		def response = client.toBlocking().retrieve("/students", Argument.listOf(Student).type)
 
