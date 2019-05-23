@@ -56,7 +56,7 @@ class ProductControllerSpec extends Specification {
 
 	def "GET /products/<ID> | not exists => 404"() {
 		given: fillStorage()
-		when: client.exchange(HttpRequest.GET(ENDPOINT_PATH + "/404"), of(Product)) as HttpResponse<Product>
+		when: client.exchange(HttpRequest.GET(ENDPOINT_PATH + "/404"), of(Product))
 		then:
 			def error = thrown(HttpClientResponseException)
 			error.response.status() == HttpStatus.NOT_FOUND
@@ -64,14 +64,14 @@ class ProductControllerSpec extends Specification {
 
 	def "GET /products/<ID> | exists => 200 wanted product"() {
 		given: def product = fillStorage()[0]
-		when: def response = (client.exchange(HttpRequest.GET(ENDPOINT_PATH + "/" + product.id), of(Product)) as HttpResponse<Product>)
+		when: def response = client.exchange(HttpRequest.GET(ENDPOINT_PATH + "/" + product.id), of(Product)) as HttpResponse<Product>
 		then: response.status() == HttpStatus.OK
 		and: response.body() == product
 	}
 
 	def "POST /products => 201 product id"() {
 		given: // Nothing to do here.
-		when: def response = (client.exchange(HttpRequest.POST(ENDPOINT_PATH, new Product()), of(String)) as HttpResponse<String>)
+		when: def response = client.exchange(HttpRequest.POST(ENDPOINT_PATH, new Product()), of(String)) as HttpResponse<String>
 		then: response.status() == HttpStatus.CREATED
 		and: response.body() != ""
 	}
@@ -80,20 +80,53 @@ class ProductControllerSpec extends Specification {
 		given:
 			def product = new Product()
 			product.id = (client.exchange(HttpRequest.POST(ENDPOINT_PATH, product), of(String)) as HttpResponse<String>).body()
-		when: def response = (client.exchange(HttpRequest.GET(ENDPOINT_PATH + "/" + product.id), of(Product)) as HttpResponse<Product>)
+		when: def response = client.exchange(HttpRequest.GET(ENDPOINT_PATH + "/" + product.id), of(Product)) as HttpResponse<Product>
 		then: response.status() == HttpStatus.OK
 		and: response.body() == product
 	}
 
-	def "PUT /products/<ID> | not exists => 404"() {}
+	def "PUT /products/<ID> | not exists => 404"() {
+		given: fillStorage()
+		when: client.exchange(HttpRequest.PUT(ENDPOINT_PATH + "/404", new Product()))
+		then:
+			def error = thrown(HttpClientResponseException)
+			error.response.status() == HttpStatus.NOT_FOUND
+	}
 
-	def "PUT /products/<ID> | exists => 204"() {}
+	def "PUT /products/<ID> | exists => 204"() {
+		given: def product = fillStorage()[0]
+		when: def response = client.exchange(HttpRequest.PUT(ENDPOINT_PATH + "/" + product.id, new Product(name: "New Name")))
+		then: response.status() == HttpStatus.NO_CONTENT
+	}
 
-	def "PUT /products/<ID> | exists => is updated"() {}
+	def "PUT /products/<ID> | exists => is updated"() {
+		given:
+			def product = fillStorage()[0]
+			client.exchange(HttpRequest.PUT(ENDPOINT_PATH + "/" + product.id, new Product(name: "New Name")))
+		when: def response = client.exchange(HttpRequest.GET(ENDPOINT_PATH + "/" + product.id), of(Product)) as HttpResponse<Product>
+		then: response.status() == HttpStatus.OK
+		and: response.body().name == "New Name"
+	}
 
-	def "DELETE /products/<ID> | not exists => 204"() {}
+	def "DELETE /products/<ID> | exists => 204"() {
+		given: def product = fillStorage()[0]
+		when: def response = client.exchange(HttpRequest.DELETE(ENDPOINT_PATH + "/" + product.id))
+		then: response.status() == HttpStatus.NO_CONTENT
+	}
 
-	def "DELETE /products/<ID> | exists => 204"() {}
+	def "DELETE /products/<ID> | not exists => 204"() {
+		given: fillStorage()
+		when: def response = client.exchange(HttpRequest.DELETE(ENDPOINT_PATH + "/404"))
+		then: response.status() == HttpStatus.NO_CONTENT
+	}
 
-	def "DELETE /products/<ID> | exists => is deleted"() {}
+	def "DELETE /products/<ID> | exists => is deleted"() {
+		given:
+			def product = fillStorage()[0]
+			client.exchange(HttpRequest.DELETE(ENDPOINT_PATH + "/" + product.id))
+		when: client.exchange(HttpRequest.GET(ENDPOINT_PATH + "/" + product.id), of(Product))
+		then:
+			def error = thrown(HttpClientResponseException)
+			error.response.status() == HttpStatus.NOT_FOUND
+	}
 }
