@@ -1,43 +1,44 @@
 plugins {
-    id "io.spring.dependency-management" version "1.0.6.RELEASE"
-    id "com.github.johnrengelman.shadow" version "4.0.2"
-    id "jacoco"
-    id "com.github.kt3k.coveralls" version "2.8.2"
+	id "io.spring.dependency-management" version "1.0.6.RELEASE"
+	id "com.github.johnrengelman.shadow" version "4.0.2"
+	id "jacoco"
+	id "com.github.kt3k.coveralls" version "2.8.2"
+	id "codenarc"
 }
 
-apply plugin:"application"
-apply plugin:"groovy"
+apply plugin: "application"
+apply plugin: "groovy"
 
 version "0.1"
 group "fr.utbm.gl51.famp"
 
 repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url "https://jcenter.bintray.com" }
+	mavenLocal()
+	mavenCentral()
+	maven { url "https://jcenter.bintray.com" }
 }
 
 dependencyManagement {
-    imports {
-        mavenBom 'io.micronaut:micronaut-bom:1.0.5'
-    }
+	imports {
+		mavenBom 'io.micronaut:micronaut-bom:1.0.5'
+	}
 }
 
 dependencies {
-    compile "io.micronaut:micronaut-http-client"
-    compile "io.micronaut:micronaut-http-server-netty"
-    compile "io.micronaut:micronaut-runtime-groovy"
-    compile "io.micronaut:micronaut-validation"
-    compileOnly "io.micronaut:micronaut-inject-groovy"
-    runtime "ch.qos.logback:logback-classic:1.2.3"
-    testCompile "io.micronaut:micronaut-inject-groovy"
-    testCompile("org.spockframework:spock-core") {
-        exclude group: "org.codehaus.groovy", module: "groovy-all"
-    }
+	compile "io.micronaut:micronaut-http-client"
+	compile "io.micronaut:micronaut-http-server-netty"
+	compile "io.micronaut:micronaut-runtime-groovy"
+	compile "io.micronaut:micronaut-validation"
+	compileOnly "io.micronaut:micronaut-inject-groovy"
+	runtime "ch.qos.logback:logback-classic:1.2.3"
+	testCompile "io.micronaut:micronaut-inject-groovy"
+	testCompile("org.spockframework:spock-core") {
+		exclude group: "org.codehaus.groovy", module: "groovy-all"
+	}
 }
 
 shadowJar {
-    mergeServiceFiles()
+	mergeServiceFiles()
 }
 
 run.jvmArgs('-noverify', '-XX:TieredStopAtLevel=1')
@@ -45,11 +46,19 @@ run.jvmArgs('-noverify', '-XX:TieredStopAtLevel=1')
 mainClassName = "fr.utbm.gl51.famp.Application"
 
 tasks.withType(GroovyCompile) {
-    groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
+	groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
 }
 
 jacocoTestReport {
-    reports {
-        xml.enabled true
-    }
+	reports {
+		xml.enabled true
+	}
 }
+
+codenarc {
+	toolVersion = "1.4"
+	ignoreFailures = false
+}
+
+codenarcMain.configFile = rootProject.file("codenarc-main.groovy")
+codenarcTest.configFile = rootProject.file("codenarc-test.groovy")
