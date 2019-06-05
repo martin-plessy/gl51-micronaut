@@ -101,7 +101,7 @@ class InMemoryProductStorageSpec extends Specification {
 		thrown NoSuchElementException
 	}
 
-	def "update storage "() {
+	def "update storage"() {
 		setup:
 		filledStorage.update(sampleProducts[1].id, new Product(name: "Four"))
 
